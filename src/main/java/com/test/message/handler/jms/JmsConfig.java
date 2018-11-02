@@ -9,36 +9,38 @@ import org.springframework.context.annotation.Primary;
 import org.springframework.jms.annotation.EnableJms;
 import org.springframework.jms.core.JmsTemplate;
 
+import com.test.message.handler.constant.ApplicationConfigurations;
+import com.test.message.handler.constant.QualifierConstants;
+
 @Configuration
 @EnableJms
 public class JmsConfig {
 
-    public static final String TOPIC_QUALIFIER = "topic";
-	@Value("${spring.activemq.broker-url}")
+	@Value(ApplicationConfigurations.BROKER_URL)
 	private String brokerUrl;
-    @Value("${spring.activemq.broker-url-topic}")
-	private String topicBrokerUrl;    
+	@Value(ApplicationConfigurations.BROKER_URL_TOPIC)
+	private String topicBrokerUrl;
 
 	@Bean
-    @Primary
+	@Primary
 	public ActiveMQConnectionFactory connectionFactory() {
 		return new ActiveMQConnectionFactory(brokerUrl);
 	}
-	
+
 	@Bean
-	@Qualifier(TOPIC_QUALIFIER)
+	@Qualifier(QualifierConstants.TOPIC)
 	public ActiveMQConnectionFactory connectionFactoryTopic() {
 		return new ActiveMQConnectionFactory(topicBrokerUrl);
 	}
 
 	@Bean
-    @Primary
+	@Primary
 	public JmsTemplate jmsTemplate() {
 		return new JmsTemplate(connectionFactory());
 	}
 
 	@Bean
-	@Qualifier(TOPIC_QUALIFIER)
+	@Qualifier(QualifierConstants.TOPIC)
 	public JmsTemplate jmsTemplateTopic() {
 		JmsTemplate jmsTemplate = new JmsTemplate(connectionFactoryTopic());
 		jmsTemplate.setPubSubDomain(true);

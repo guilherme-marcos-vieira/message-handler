@@ -23,6 +23,8 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.jms.core.JmsTemplate;
 import org.springframework.test.context.junit4.SpringRunner;
 
+import com.test.message.handler.constant.ApplicationConfigurations;
+import com.test.message.handler.constant.QualifierConstants;
 import com.test.message.handler.model.RequestRouteDto;
 import com.test.message.handler.util.JaxbUtils;
 
@@ -32,44 +34,23 @@ public class MessageListenerComponentIntegrationTests {
 
 	private static final int MAX_ATTEMPTS = 3;
 	private static final long WAIT_INTERVAL_TIME = 3000L;
-	private static final String MESSAGE_TEST = "<UC_STOCK_LEVEL_IFD>\r\n" + 
-			"\r\n" + 
-			"<CTRL_SEG>\r\n" + 
-			"\r\n" + 
-			"<TRNNAM>UC_STOCK_LEVEL</TRNNAM>\r\n" + 
-			"\r\n" + 
-			"<TRNVER>20180100</TRNVER>\r\n" + 
-			"\r\n" + 
-			"<UUID>0de01919-81eb-4cc7-a51d-15f6085fc1a4</UUID>\r\n" + 
-			"\r\n" + 
-			"<WH_ID>WHS01</WH_ID>\r\n" + 
-			"\r\n" + 
-			"<CLIENT_ID>CLIE01</CLIENT_ID>\r\n" + 
-			"\r\n" + 
-			"<ISO_2_CTRY_NAME>GB</ISO_2_CTRY_NAME>\r\n" + 
-			"\r\n" + 
-			"<REQUEST_ID>bc2a55e8-5a07-4af6-85fd-8290d3ccfb51</REQUEST_ID>\r\n" + 
-			"\r\n" + 
-			"<ROUTE_ID>186</ROUTE_ID>\r\n" + 
-			"\r\n" + 
-			"</CTRL_SEG>\r\n" + 
-			"\r\n" + 
-			"</UC_STOCK_LEVEL_IFD>";
-	@Value("${spring.activemq.broker-url}")
+	private static final String MESSAGE_TEST = "<UC_STOCK_LEVEL_IFD><CTRL_SEG><TRNNAM>UC_STOCK_LEVEL</TRNNAM><TRNVER>20180100</TRNVER><UUID>0de01919-81eb-4cc7-a51d-15f6085fc1a4</UUID><WH_ID>WHS01</WH_ID><CLIENT_ID>CLIE01</CLIENT_ID><ISO_2_CTRY_NAME>GB</ISO_2_CTRY_NAME><REQUEST_ID>bc2a55e8-5a07-4af6-85fd-8290d3ccfb51</REQUEST_ID><ROUTE_ID>186</ROUTE_ID></CTRL_SEG></UC_STOCK_LEVEL_IFD>";
+	private static final RequestRouteDto EXPECTED_REQUEST_ROUTE_DTO = new RequestRouteDto("bc2a55e8-5a07-4af6-85fd-8290d3ccfb51", 186L);
+	@Value(ApplicationConfigurations.BROKER_URL)
 	private String brokerUrl;
-	@Value("${spring.activemq.broker-url-topic}")
+	@Value(ApplicationConfigurations.BROKER_URL_TOPIC)
 	private String topicBrokerUrl;
-	@Value("${topic.store}")
+	@Value(ApplicationConfigurations.TOPIC_STORE)
 	private String topicDestination;
-	@Value("${queue.stock}")
+	@Value(ApplicationConfigurations.QUEUE_STOCK)
 	private String queueDestination;
 	@Autowired
-	@Qualifier(JmsConfig.TOPIC_QUALIFIER)
+	@Qualifier(QualifierConstants.TOPIC)
 	private JmsTemplate topicJmsTemplate;
 	@Autowired
 	private JmsTemplate jmsTemplate;
 	@Autowired
-	@Qualifier(JmsConfig.TOPIC_QUALIFIER)
+	@Qualifier(QualifierConstants.TOPIC)
 	private ConnectionFactory topicConnectionFactory;
 	private Connection topicConnection;
 	private Session topicSession;
@@ -87,12 +68,11 @@ public class MessageListenerComponentIntegrationTests {
 	@Test
 	public void shouldReceiveTopicFromQueue() throws Exception {
 		consumesTopic();
-		jmsTemplate.convertAndSend(queueDestination, MESSAGE_TEST);		
+		jmsTemplate.convertAndSend(queueDestination, MESSAGE_TEST);
 		waitForTopicMessage();
-		
+
 		RequestRouteDto requestRouteDto = JaxbUtils.unmarshal(listener.getReceivedMessage(), RequestRouteDto.class);
-		RequestRouteDto expectedRequestRouteDto = new RequestRouteDto("bc2a55e8-5a07-4af6-85fd-8290d3ccfb51", 186L);
-		assertEquals(expectedRequestRouteDto, requestRouteDto);
+		assertEquals(EXPECTED_REQUEST_ROUTE_DTO, requestRouteDto);
 	}
 
 	private void waitForTopicMessage() throws InterruptedException {

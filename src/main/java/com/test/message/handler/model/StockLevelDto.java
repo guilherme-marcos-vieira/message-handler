@@ -15,6 +15,13 @@ public class StockLevelDto implements Serializable {
 	@XmlElement(name = "CTRL_SEG")
 	private StockControlDto stockControlDto;
 
+	public StockLevelDto() {
+	}
+
+	public StockLevelDto(StockControlDto stockControlDto) {
+		this.stockControlDto = stockControlDto;
+	}
+
 	public StockControlDto getStockControlDto() {
 		return stockControlDto;
 	}

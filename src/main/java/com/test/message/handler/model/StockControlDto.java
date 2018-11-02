@@ -29,6 +29,14 @@ public class StockControlDto implements Serializable {
 	@XmlElement(name = "ROUTE_ID")
 	private Long routeId;
 
+	public StockControlDto() {
+	}
+
+	public StockControlDto(String requestId, Long routeId) {
+		this.requestId = requestId;
+		this.routeId = routeId;
+	}
+
 	public String getTrnam() {
 		return trnam;
 	}
