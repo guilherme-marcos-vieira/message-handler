@@ -1,1 +1,2 @@
 # message-handler
+[![Build Status](https://travis-ci.org/guilherme-marcos-vieira/message-handler.svg?branch=master)](https://travis-ci.org/guilherme-marcos-vieira/message-handler)[![codecov](https://codecov.io/gh/guilherme-marcos-vieira/message-handler/branch/master/graph/badge.svg)](https://codecov.io/gh/guilherme-marcos-vieira/message-handler)
